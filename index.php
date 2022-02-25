@@ -61,7 +61,7 @@ $pdo = new PDO('mysql:host=localhost;dbname=skripsi-max-miner','root','');
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 
-$headers = array('No', 'ID Transaksi', 'Items', 'Harga Total', 'Tanggal');
+$headers = array('NO', 'NO.BON', 'TANGGAL', 'NAMA PRODUK', 'JUMLAH', 'HARGA');
 $range_A_Z = range('A', 'Z');
 $data = $pdo->query('SELECT * FROM `order`', PDO::FETCH_ASSOC)->fetchAll();
 
@@ -84,17 +84,25 @@ for ($rows = 1; $rows < (count($data)+2); $rows++)
 			{
 				$sheet->setCellValue($range_A_Z[$i].$rows, ($rows-1)); // numbering
 			}
+			elseif ($i == 1)
+			{
+				$sheet->setCellValue($range_A_Z[$i].$rows, $data[$rows-2]['uid']); // order.uid
+			}
 			elseif ($i == 2)
 			{
-				$sheet->setCellValue($range_A_Z[$i].$rows, implode(', ', $cart)); // custom column for item
+				$sheet->setCellValue($range_A_Z[$i].$rows, nice_date($data[$rows-2]['date'], 'd/m/Y')); // order.date
+			}
+			elseif ($i == 3)
+			{
+				$sheet->setCellValue($range_A_Z[$i].$rows, implode(', ', $cart)); // cart items
 			}
 			elseif ($i == 4)
 			{
-				$sheet->setCellValue($range_A_Z[$i].$rows, nice_date($data[$rows-2][array_keys($data[$rows-2])[$i]], 'd/m/Y')); // custom column for date
+				$sheet->setCellValue($range_A_Z[$i].$rows, count($cart)); // order.total
 			}
 			else
 			{
-				$sheet->setCellValue($range_A_Z[$i].$rows, $data[$rows-2][array_keys($data[$rows-2])[$i]]);
+				$sheet->setCellValue($range_A_Z[$i].$rows, $data[$rows-2]['total']); // order.total
 			}
 		}
 	}
